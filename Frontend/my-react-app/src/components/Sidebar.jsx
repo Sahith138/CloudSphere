@@ -2,6 +2,8 @@ import { Home, Folder, Users, Bell, User, Trash2, Activity, Star, X } from "luci
 import { Link } from "react-router-dom";
 
 function Sidebar({ closeMobileMenu }) {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  
   return (
     <div className="w-64 h-full bg-slate-900 text-white p-5 flex flex-col shadow-2xl md:shadow-none">
       <div className="flex items-center justify-between mb-10">
@@ -51,11 +53,15 @@ function Sidebar({ closeMobileMenu }) {
             Storage
           </Link>
           </li>
-          <li>
-          <Link to="/admin" className="flex items-center gap-3 cursor-pointer hover:text-blue-400">
-            Admin
-          </Link>
-        </li>
+          
+          {user?.isAdmin && (
+            <li>
+              <Link to="/admin" className="flex items-center gap-3 cursor-pointer hover:text-blue-400">
+                Admin
+              </Link>
+            </li>
+          )}
+
         <li>
           <Link to="/trash" className="flex items-center gap-3 cursor-pointer hover:text-blue-400">
             <Trash2 size={20} /> Trash

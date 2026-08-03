@@ -72,6 +72,7 @@ const register = async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        isAdmin: user.isAdmin,
       },
     });
   } catch (error) {
@@ -137,6 +138,7 @@ const login = async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        isAdmin: user.isAdmin,
       },
     });
   } catch (error) {

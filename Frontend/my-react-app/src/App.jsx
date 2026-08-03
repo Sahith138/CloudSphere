@@ -17,6 +17,7 @@ import ActivityLog from "./pages/ActivityLog";
 import Favorites from "./pages/Favorites";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 import Layout from "./components/Layout";
 import SharedFile from "./pages/SharedFile";
 import Search from "./pages/Search";
@@ -42,7 +43,10 @@ function App() {
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/invitations" element={<Invitations />} />
           <Route path="/storage" element={<StorageAnalytics />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          
+          {/* Admin Protected Route */}
+          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          
           <Route path="/trash" element={<Trash />} />
           <Route path="/activity" element={<ActivityLog />} />
           <Route path="/favorites" element={<Favorites />} />
