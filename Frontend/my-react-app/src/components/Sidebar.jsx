@@ -2,7 +2,7 @@ import { Home, Folder, Users, Bell, User, Trash2, Activity, Star, X } from "luci
 import { Link } from "react-router-dom";
 
 function Sidebar({ closeMobileMenu }) {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
   
   return (
     <div className="w-64 h-full bg-slate-900 text-white p-5 flex flex-col shadow-2xl md:shadow-none">

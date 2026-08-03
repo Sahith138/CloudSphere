@@ -14,7 +14,7 @@ function AIModal({ file, onClose }) {
   const fetchSummary = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const res = await API.post(`/ai/summarize/${file.id}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -29,7 +29,7 @@ function AIModal({ file, onClose }) {
   const fetchKeywords = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const res = await API.post(`/ai/extract-keywords/${file.id}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -50,7 +50,7 @@ function AIModal({ file, onClose }) {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const res = await API.post(`/ai/chat/${file.id}`, { message, history: chatHistory }, {
         headers: { Authorization: `Bearer ${token}` }
       });

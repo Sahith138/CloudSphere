@@ -20,7 +20,7 @@ function Dashboard() {
 
   const fetchStats = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const res = await API.get("/dashboard/stats", {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -36,7 +36,7 @@ function Dashboard() {
 
   const fetchStorage = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const res = await API.get("/dashboard/storage", {
         headers: { Authorization: `Bearer ${token}` }
       });

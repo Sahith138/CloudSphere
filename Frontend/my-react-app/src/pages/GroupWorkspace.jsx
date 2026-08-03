@@ -30,7 +30,7 @@ function GroupWorkspace() {
   const fetchGroupData = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       
       const groupsRes = await API.get("/groups/my-groups", {
         headers: { Authorization: `Bearer ${token}` }
@@ -57,26 +57,26 @@ function GroupWorkspace() {
   };
 
   const fetchFiles = async () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const res = await API.get(`/groups/${groupId}/files`, { headers: { Authorization: `Bearer ${token}` } });
     setFiles(res.data.files);
   };
 
   const fetchMembers = async () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const res = await API.get(`/groups/${groupId}/members`, { headers: { Authorization: `Bearer ${token}` } });
     setMembers(res.data.members);
   };
 
   const fetchActivity = async () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const res = await API.get(`/groups/${groupId}/activity`, { headers: { Authorization: `Bearer ${token}` } });
     setActivities(res.data.activities);
   };
 
   const handleInvite = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const response = await API.post(`/groups/${groupId}/invite`, { email: inviteEmail }, { headers: { Authorization: `Bearer ${token}` } });
       alert(response.data.message || "Invitation sent successfully");
       setShowInviteModal(false);
@@ -89,7 +89,7 @@ function GroupWorkspace() {
 
   const changeRole = async (memberId, newRole) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await API.put(`/groups/${groupId}/members/${memberId}/role`, { role: newRole }, { headers: { Authorization: `Bearer ${token}` } });
       fetchMembers();
     } catch (error) {
@@ -102,7 +102,7 @@ function GroupWorkspace() {
     if (selectedFiles.length === 0) return;
     setUploading(true);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const formData = new FormData();
       selectedFiles.forEach(f => formData.append("files", f));
       formData.append("groupId", groupId);
@@ -125,7 +125,7 @@ function GroupWorkspace() {
 
   const downloadFile = async (id, fileName) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const response = await API.get(`/files/download/${id}`, {
         responseType: "blob",
         headers: { Authorization: `Bearer ${token}` },

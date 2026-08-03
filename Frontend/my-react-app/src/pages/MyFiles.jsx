@@ -34,7 +34,7 @@ function MyFiles() {
 
   const fetchFolders = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       const res = await API.get(`/folders/my-folders?sort=${sort}&type=${type}`, {
         headers: {
@@ -49,7 +49,7 @@ function MyFiles() {
   };
   const fetchFiles = async () => {
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     const res = await API.get(`/files/my-files?sort=${sort}&type=${type}`, {
       headers: {
@@ -70,7 +70,7 @@ function MyFiles() {
         return;
       }
 
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       await API.post(
         "/folders/create",
@@ -95,7 +95,7 @@ function MyFiles() {
   };
   const deleteFolder = async (id) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     await API.delete(
       `/folders/delete/${id}`,
@@ -119,7 +119,7 @@ function MyFiles() {
         return;
       }
 
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       const formData = new FormData();
       selectedFiles.forEach(file => {
@@ -156,7 +156,7 @@ function MyFiles() {
 
   const toggleFavoriteFolder = async (id) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await API.put(`/favorites/folder/${id}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -168,7 +168,7 @@ function MyFiles() {
 
   const toggleFavoriteFile = async (id) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await API.put(`/favorites/file/${id}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -179,7 +179,7 @@ function MyFiles() {
   };
 const openFolder = async (folder) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     const res = await API.get(
       `/files/folder/${folder.id}`,
@@ -198,7 +198,7 @@ const openFolder = async (folder) => {
 };
 const downloadFile = async (id, fileName) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     const response = await API.get(
       `/files/download/${id}`,
@@ -234,7 +234,7 @@ const downloadFile = async (id, fileName) => {
 };
 const deleteFile = async (id) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     await API.delete(
       `/files/delete/${id}`,
@@ -256,7 +256,7 @@ const deleteFile = async (id) => {
 };
 const moveFile = async (fileId, folderId) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     await API.put(
       `/files/move/${fileId}`,
@@ -283,7 +283,7 @@ const searchFiles = async (value) => {
   setSearch(value);
 
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     if (value === "") {
       fetchFiles();
@@ -310,7 +310,7 @@ const shareFile = async (id) => {
 
   try {
 
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     const res = await API.put(
       `/files/share/${id}`,
@@ -334,7 +334,7 @@ const shareFile = async (id) => {
 const renameFile = async () => {
   try {
 
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     await API.put(
       `/files/rename/${renameFileId}`,
@@ -364,7 +364,7 @@ const renameFile = async () => {
 const renameFolder = async () => {
   try {
 
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     await API.put(
       `/folders/rename/${renameFolderId}`,

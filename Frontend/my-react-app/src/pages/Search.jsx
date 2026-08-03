@@ -22,7 +22,7 @@ function Search() {
     if (!searchQuery.trim()) return;
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const res = await API.get(`/files/search?name=${searchQuery}`, {
         headers: { Authorization: `Bearer ${token}` }
       });

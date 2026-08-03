@@ -11,7 +11,7 @@ function Groups() {
 
   const fetchGroups = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const res = await API.get("/groups/my-groups", {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -27,7 +27,7 @@ function Groups() {
 
   const createGroup = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await API.post("/groups/create", { name, description }, {
         headers: { Authorization: `Bearer ${token}` }
       });

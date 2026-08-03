@@ -11,7 +11,7 @@ function Notifications() {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const res = await API.get("/notifications", {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -29,7 +29,7 @@ function Notifications() {
 
   const markAllRead = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await API.put("/notifications/mark-read", {}, {
         headers: { Authorization: `Bearer ${token}` }
       });

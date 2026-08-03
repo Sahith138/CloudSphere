@@ -11,7 +11,7 @@ function Navbar({ toggleSidebar }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   
-  const user = JSON.parse(localStorage.getItem("user")) || {};
+  const user = JSON.parse(sessionStorage.getItem("user")) || {};
 
   // Live Search States
   const [searchResults, setSearchResults] = useState([]);
@@ -20,14 +20,14 @@ function Navbar({ toggleSidebar }) {
   const searchTimeoutRef = useRef(null);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
     navigate("/");
   };
 
   const fetchNotifications = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) return;
       const res = await API.get("/notifications", {
         headers: { Authorization: `Bearer ${token}` }
@@ -66,7 +66,7 @@ function Navbar({ toggleSidebar }) {
     if (search.trim()) {
       searchTimeoutRef.current = setTimeout(async () => {
         try {
-          const token = localStorage.getItem("token");
+          const token = sessionStorage.getItem("token");
           const res = await API.get(`/files/search?name=${search}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -88,7 +88,7 @@ function Navbar({ toggleSidebar }) {
 
   const markAllRead = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await API.put("/notifications/mark-read", {}, {
         headers: { Authorization: `Bearer ${token}` }
       });

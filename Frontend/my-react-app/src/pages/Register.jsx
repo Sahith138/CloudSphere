@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../api/authApi";
 import { User, Mail, Lock, ArrowRight, Cloud, EyeOff } from "lucide-react";
@@ -12,6 +12,12 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
+  useEffect(() => {
+    if (sessionStorage.getItem("token")) {
+      navigate("/dashboard");
+    }
+  }, [navigate]);
 
   const handleRegister = async (e) => {
     e.preventDefault();

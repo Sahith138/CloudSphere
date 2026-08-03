@@ -10,7 +10,7 @@ function Profile() {
 
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       const res = await API.get("/users/me", {
         headers: {

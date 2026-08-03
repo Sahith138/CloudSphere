@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../api/authApi";
 import { Mail, Lock, ArrowRight, Cloud, EyeOff } from "lucide-react";
@@ -11,6 +11,12 @@ function Login() {
   const [errorMsg, setErrorMsg] = useState("");
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
+  useEffect(() => {
+    if (sessionStorage.getItem("token")) {
+      navigate("/dashboard");
+    }
+  }, [navigate]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -18,8 +24,8 @@ function Login() {
 
     try {
       const res = await API.post("/auth/login", { email, password });
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      sessionStorage.setItem("token", res.data.token);
+      sessionStorage.setItem("user", JSON.stringify(res.data.user));
       navigate("/dashboard");
     } catch (error) {
       setErrorMsg(error.response?.data?.message || "Login Failed");

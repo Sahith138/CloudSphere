@@ -8,7 +8,7 @@ function Trash() {
 
   const fetchTrash = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const res = await axios.get("http://localhost:5000/api/trash", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -26,7 +26,7 @@ function Trash() {
 
   const handleRestore = async (id, type) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await axios.post(
         "http://localhost:5000/api/trash/restore",
         { id, type },
@@ -42,7 +42,7 @@ function Trash() {
     if (!window.confirm("Are you sure you want to permanently delete all items in the trash? This cannot be undone.")) return;
     
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await axios.delete("http://localhost:5000/api/trash/empty", {
         headers: { Authorization: `Bearer ${token}` },
       });

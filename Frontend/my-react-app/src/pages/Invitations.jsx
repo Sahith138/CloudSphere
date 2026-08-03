@@ -9,7 +9,7 @@ function Invitations() {
 
   const fetchInvitations = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const res = await API.get("/groups/invitations", {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -27,7 +27,7 @@ function Invitations() {
 
   const handleInvitation = async (id, action) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await API.put(`/groups/invitations/${id}/${action}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });

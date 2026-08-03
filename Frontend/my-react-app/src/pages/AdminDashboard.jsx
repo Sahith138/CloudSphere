@@ -19,7 +19,7 @@ function AdminDashboard() {
 
   const fetchAdminStats = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         const res = await API.get("/dashboard/admin", {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -33,7 +33,7 @@ function AdminDashboard() {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const res = await API.get("/dashboard/admin/users", {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -48,7 +48,7 @@ function AdminDashboard() {
   const handleQuotaChange = async (userId, newQuotaGB) => {
     try {
       setUpdatingQuota(userId);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const quotaBytes = newQuotaGB * 1024 * 1024 * 1024;
       await API.put(`/dashboard/admin/users/${userId}/quota`, { quotaBytes }, {
         headers: { Authorization: `Bearer ${token}` }
