@@ -1,5 +1,5 @@
 const prisma = require("../config/prisma");
-const { v4: uuidv4 } = require("uuid");
+const crypto = require("crypto");
 const { createNotification } = require("./notificationController");
 // UPLOAD FILE
 const uploadFile = async (req, res) => {
@@ -324,7 +324,7 @@ const shareFile = async (req, res) => {
   try {
     const fileId = Number(req.params.id);
 
-    const token = uuidv4();
+    const token = crypto.randomUUID();
 
     const file = await prisma.file.update({
       where: {

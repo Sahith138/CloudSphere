@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node src/server.js",
     "dev": "nodemon src/server.js"
   },
   "keywords": [],
@@ -30,7 +31,6 @@
     "nodemailer": "^9.0.3",
     "pdf-parse": "^2.4.5",
     "prisma": "^6.19.3",
-    "uuid": "^14.0.1",
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
