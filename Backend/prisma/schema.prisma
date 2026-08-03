@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  storageQuota Float @default(1073741824) // 1 GB in bytes
+  createdAt DateTime @default(now())
+
+  folders Folder[]
+  files   File[]
+  activityLogs ActivityLog[]
+  groupMembers GroupMember[]
+  notifications Notification[]
+}
+
+model Folder {
+  id        Int      @id @default(autoincrement())
+  name      String
+  userId    Int
+  groupId   Int?
+  isTrashed Boolean  @default(false)
+  isFavorite Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  user  User   @relation(fields: [userId], references: [id])
+  group Group? @relation(fields: [groupId], references: [id])
+  files File[]
+  activityLogs ActivityLog[]
+}
+
+model File {
+  id          Int      @id @default(autoincrement())
+  name        String
+  fileUrl     String
+  size        String?
+  isTrashed   Boolean  @default(false)
+  isFavorite  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  userId      Int
+  folderId    Int?
+  groupId     Int?
+
+  // Sharing Feature
+  shareToken  String?  @unique
+  isPublic    Boolean  @default(false)
+
+  // AI Features
+  summary     String?
+  keywords    String[]
+
+  user   User    @relation(fields: [userId], references: [id])
+  folder Folder? @relation(fields: [folderId], references: [id])
+  group  Group?  @relation(fields: [groupId], references: [id])
+  activityLogs ActivityLog[]
+}
+
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+  action    String
+  details   String
+  userId    Int
+  fileId    Int?
+  folderId  Int?
+  groupId   Int?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  file      File?    @relation(fields: [fileId], references: [id], onDelete: SetNull)
+  folder    Folder?  @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  group     Group?   @relation(fields: [groupId], references: [id], onDelete: SetNull)
+}
+
+model Group {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+
+  members     GroupMember[]
+  invitations GroupInvitation[]
+  files       File[]
+  folders     Folder[]
+  activityLogs ActivityLog[]
+}
+
+model GroupMember {
+  id        Int      @id @default(autoincrement())
+  groupId   Int
+  userId    Int
+  role      Role     @default(VIEWER)
+  createdAt DateTime @default(now())
+
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+}
+
+model GroupInvitation {
+  id           Int      @id @default(autoincrement())
+  groupId      Int
+  inviterId    Int
+  inviteeEmail String
+  status       InvitationStatus @default(PENDING)
+  createdAt    DateTime @default(now())
+
+  group        Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  message   String
+  type      String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
