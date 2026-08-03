@@ -11,7 +11,7 @@ function Favorites() {
   const fetchFavorites = async () => {
     try {
       const token = sessionStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/favorites", {
+      const res = await API.get("/favorites", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFavorites({ files: res.data.files, folders: res.data.folders });
@@ -29,7 +29,7 @@ function Favorites() {
   const toggleFavoriteFolder = async (id) => {
     try {
       const token = sessionStorage.getItem("token");
-      await axios.put(`http://localhost:5000/api/favorites/folder/${id}`, {}, {
+      await API.put(`/favorites/folder/${id}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchFavorites();
@@ -41,7 +41,7 @@ function Favorites() {
   const toggleFavoriteFile = async (id) => {
     try {
       const token = sessionStorage.getItem("token");
-      await axios.put(`http://localhost:5000/api/favorites/file/${id}`, {}, {
+      await API.put(`/favorites/file/${id}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchFavorites();

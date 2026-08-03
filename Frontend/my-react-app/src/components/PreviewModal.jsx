@@ -6,7 +6,8 @@ function PreviewModal({ file, onClose }) {
   const isImage = file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i);
   const isVideo = file.name.match(/\.(mp4|webm|ogg)$/i);
   const normalizedPath = encodeURI(file.fileUrl.replace(/\\/g, "/"));
-  const fileUrl = normalizedPath.startsWith("http") ? normalizedPath : `http://localhost:5000/${normalizedPath}`;
+  const backendUrl = import.meta.env.VITE_API_URL.replace('/api', '');
+  const fileUrl = normalizedPath.startsWith("http") ? normalizedPath : `${backendUrl}/${normalizedPath}`;
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
       <div className="relative bg-slate-900 rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-slate-700">

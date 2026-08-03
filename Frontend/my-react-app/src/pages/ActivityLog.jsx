@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import API from "../api/authApi";
 import { Activity, RefreshCw, Clock } from "lucide-react";
 
 function ActivityLog() {
@@ -9,7 +9,7 @@ function ActivityLog() {
   const fetchLogs = async () => {
     try {
       const token = sessionStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/activity", {
+      const res = await API.get("/activity", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setLogs(res.data.logs);

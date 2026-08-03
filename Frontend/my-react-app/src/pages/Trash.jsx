@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import API from "../api/authApi";
 import { Trash2, RefreshCw, File as FileIcon, Folder as FolderIcon, AlertCircle } from "lucide-react";
 
 function Trash() {
@@ -9,7 +9,7 @@ function Trash() {
   const fetchTrash = async () => {
     try {
       const token = sessionStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/trash", {
+      const res = await API.get("/trash", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTrashedItems({ files: res.data.files, folders: res.data.folders });
@@ -27,8 +27,8 @@ function Trash() {
   const handleRestore = async (id, type) => {
     try {
       const token = sessionStorage.getItem("token");
-      await axios.post(
-        "http://localhost:5000/api/trash/restore",
+      await API.post(
+        "/trash/restore",
         { id, type },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -43,7 +43,7 @@ function Trash() {
     
     try {
       const token = sessionStorage.getItem("token");
-      await axios.delete("http://localhost:5000/api/trash/empty", {
+      await API.delete("/trash/empty", {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchTrash();
