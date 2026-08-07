@@ -103,21 +103,52 @@ function GroupWorkspace() {
     setUploading(true);
     try {
       const token = sessionStorage.getItem("token");
-      const formData = new FormData();
-      selectedFiles.forEach(f => formData.append("files", f));
-      formData.append("groupId", groupId);
-
-      await API.post("/files/upload", formData, {
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" }
-      });
       
+      const fileMetadata = selectedFiles.map(f => ({ name: f.name, size: f.size, type: f.type }));
+      
+      const presignedRes = await API.post(
+        "/files/upload-presigned-urls",
+        { files: fileMetadata },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const { presignedUrls } = presignedRes.data;
+
+      const uploadPromises = selectedFiles.map(async (file, index) => {
+        const { uploadUrl, fileUrl } = presignedUrls[index];
+        const res = await fetch(uploadUrl, {
+          method: "PUT",
+          body: file,
+          headers: {
+            "Content-Type": file.type || "application/octet-stream",
+          },
+        });
+        if (!res.ok) throw new Error("S3 Upload Failed");
+        return {
+          name: file.name,
+          size: file.size,
+          fileUrl: fileUrl
+        };
+      });
+
+      const uploadedFilesMetadata = await Promise.all(uploadPromises);
+
+      await API.post(
+        "/files/upload-confirm",
+        {
+          files: uploadedFilesMetadata,
+          groupId: groupId,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
       setSelectedFiles([]);
       fetchFiles();
       fetchActivity();
-      toast.success("Files uploaded successfully");
+      toast.success("Files uploaded directly successfully ⚡");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to upload files");
+      toast.error(error?.response?.data?.message || "Failed to upload files");
     } finally {
       setUploading(false);
     }

@@ -6,6 +6,8 @@ const upload = require("../config/multer");
 
 const {
       uploadFile,
+      generatePresignedUrls,
+      confirmUpload,
       getMyFiles,
       deleteFile,
       getFilesByFolder,
@@ -16,11 +18,26 @@ const {
       getSharedFile,
       renameFile,
     } = require("../controllers/fileController");
+
+// Legacy upload
 router.post(
   "/upload",
   authMiddleware,
   upload.array("files"),
   uploadFile
+);
+
+// Direct Upload endpoints
+router.post(
+  "/upload-presigned-urls",
+  authMiddleware,
+  generatePresignedUrls
+);
+
+router.post(
+  "/upload-confirm",
+  authMiddleware,
+  confirmUpload
 );
 
 router.get(

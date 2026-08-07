@@ -93,64 +93,17 @@ function MyFiles() {
       toast.error("Failed to create folder");
     }
   };
+
   const deleteFolder = async (id) => {
-  try {
-    const token = sessionStorage.getItem("token");
-
-    await API.delete(
-      `/folders/delete/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    fetchFolders();
-  } catch (error) {
-    console.log(error);
-    toast.error("Failed to delete folder");
-  }
-};
-  const uploadFile = async () => {
     try {
-      if (!selectedFiles || selectedFiles.length === 0) {
-        toast.success("Please select at least one file");
-        return;
-      }
-
       const token = sessionStorage.getItem("token");
-
-      const formData = new FormData();
-      selectedFiles.forEach(file => {
-        formData.append("files", file);
+      await API.delete(`/folders/delete/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      formData.append(
-        "folderId",
-        selectedFolder ? selectedFolder.id : ""
-      );
-
-      const res = await API.post(
-        "/files/upload",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      console.log(res.data);
-
-      toast.success("Files uploaded successfully");
-      fetchFiles();
-
-      setSelectedFiles([]);
-      setShowUpload(false);
+      fetchFolders();
     } catch (error) {
       console.log(error);
-      toast.error("Upload failed");
+      toast.error("Failed to delete folder");
     }
   };
 
@@ -177,25 +130,81 @@ function MyFiles() {
       console.error("Error toggling favorite:", error);
     }
   };
-const openFolder = async (folder) => {
-  try {
-    const token = sessionStorage.getItem("token");
 
-    const res = await API.get(
-      `/files/folder/${folder.id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+  const uploadFile = async () => {
+    try {
+      if (!selectedFiles || selectedFiles.length === 0) {
+        toast.success("Please select at least one file");
+        return;
       }
-    );
+      const token = sessionStorage.getItem("token");
 
-    setFiles(res.data.files);
-    setSelectedFolder(folder);
-  } catch (error) {
-    console.log(error);
-  }
-};
+      const fileMetadata = selectedFiles.map(f => ({ name: f.name, size: f.size, type: f.type }));
+      
+      const presignedRes = await API.post(
+        "/files/upload-presigned-urls",
+        { files: fileMetadata },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const { presignedUrls } = presignedRes.data;
+
+      const uploadPromises = selectedFiles.map(async (file, index) => {
+        const { uploadUrl, fileUrl } = presignedUrls[index];
+        const res = await fetch(uploadUrl, {
+          method: "PUT",
+          body: file,
+          headers: {
+            "Content-Type": file.type || "application/octet-stream",
+          },
+        });
+        if (!res.ok) throw new Error("S3 Upload Failed");
+        return {
+          name: file.name,
+          size: file.size,
+          fileUrl: fileUrl
+        };
+      });
+
+      const uploadedFilesMetadata = await Promise.all(uploadPromises);
+
+      await API.post(
+        "/files/upload-confirm",
+        {
+          files: uploadedFilesMetadata,
+          folderId: selectedFolder ? selectedFolder.id : null,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      toast.success("Files uploaded directly successfully ⚡");
+      fetchFiles();
+      setSelectedFiles([]);
+      setShowUpload(false);
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.response?.data?.message || "Upload failed");
+    }
+  };
+
+  const openFolder = async (folder) => {
+    try {
+      const token = sessionStorage.getItem("token");
+      const res = await API.get(
+        `/files/folder/${folder.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setFiles(res.data.files);
+      setSelectedFolder(folder);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
 const downloadFile = async (id, fileName) => {
   try {
     const token = sessionStorage.getItem("token");

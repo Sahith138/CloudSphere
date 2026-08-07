@@ -1,7 +1,27 @@
 const prisma = require("../config/prisma");
 const crypto = require("crypto");
 const { createNotification } = require("./notificationController");
-// UPLOAD FILE
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const { PutObjectCommand, S3Client } = require("@aws-sdk/client-s3");
+
+// Initialize S3Client
+let s3;
+if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY && process.env.AWS_REGION && process.env.AWS_S3_BUCKET_NAME) {
+  const s3Config = {
+    region: process.env.AWS_REGION,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    }
+  };
+  if (process.env.AWS_ENDPOINT) {
+    s3Config.endpoint = process.env.AWS_ENDPOINT;
+    s3Config.forcePathStyle = true;
+  }
+  s3 = new S3Client(s3Config);
+}
+
+// UPLOAD FILE (Legacy Form Data fallback)
 const uploadFile = async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
@@ -73,6 +93,115 @@ const uploadFile = async (req, res) => {
       success: false,
       error: error.message,
     });
+  }
+};
+
+// DIRECT UPLOADS: Generate Presigned URLs
+const generatePresignedUrls = async (req, res) => {
+  try {
+    if (!s3) {
+      return res.status(500).json({ success: false, message: "S3 is not configured on the server." });
+    }
+
+    const { files } = req.body;
+    if (!files || files.length === 0) {
+      return res.status(400).json({ success: false, message: "No files provided" });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const currentFiles = await prisma.file.findMany({
+      where: { userId: req.user.id },
+      select: { size: true }
+    });
+
+    let currentUsedStorage = 0;
+    currentFiles.forEach(f => currentUsedStorage += Number(f.size || 0));
+
+    let newFilesSize = 0;
+    files.forEach(f => newFilesSize += Number(f.size || 0));
+
+    if (currentUsedStorage + newFilesSize > user.storageQuota) {
+      return res.status(400).json({ 
+        success: false, 
+        message: `Storage Quota Exceeded. You have ${((user.storageQuota - currentUsedStorage)/1024/1024).toFixed(2)} MB remaining.` 
+      });
+    }
+
+    const presignedUrls = [];
+    for (const file of files) {
+      const key = Date.now().toString() + "-" + file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const command = new PutObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: key,
+        ContentType: file.type || "application/octet-stream",
+      });
+      const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+      
+      let fileUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+      if (process.env.AWS_ENDPOINT) {
+        fileUrl = `${process.env.AWS_ENDPOINT}/${process.env.AWS_S3_BUCKET_NAME}/${key}`;
+      }
+
+      presignedUrls.push({
+        fileName: file.name,
+        originalSize: file.size,
+        uploadUrl: url,
+        fileKey: key,
+        fileUrl: fileUrl
+      });
+    }
+
+    res.status(200).json({ success: true, presignedUrls });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// DIRECT UPLOADS: Confirm Uploads
+const confirmUpload = async (req, res) => {
+  try {
+    const { files, folderId, groupId } = req.body;
+    if (!files || files.length === 0) {
+      return res.status(400).json({ success: false, message: "No files provided" });
+    }
+
+    const uploadedFiles = [];
+    const activities = [];
+
+    for (const file of files) {
+      const newFile = await prisma.file.create({
+        data: {
+          name: file.name,
+          fileUrl: file.fileUrl,
+          size: String(file.size),
+          userId: req.user.id,
+          folderId: folderId ? Number(folderId) : null,
+          groupId: groupId ? Number(groupId) : null,
+        },
+      });
+
+      uploadedFiles.push(newFile);
+
+      activities.push({
+        action: "UPLOAD_FILE",
+        details: `Uploaded file ${newFile.name}`,
+        userId: req.user.id,
+        fileId: newFile.id,
+        folderId: newFile.folderId,
+        groupId: newFile.groupId
+      });
+    }
+
+    await prisma.activityLog.createMany({ data: activities });
+    await createNotification(req.user.id, `Successfully uploaded ${uploadedFiles.length} file(s)`, "UPLOAD_COMPLETED");
+
+    res.status(201).json({ success: true, files: uploadedFiles });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -428,6 +557,8 @@ const renameFile = async (req, res) => {
 };
 module.exports = {
   uploadFile,
+  generatePresignedUrls,
+  confirmUpload,
   getMyFiles,
   downloadFile,
   deleteFile,
