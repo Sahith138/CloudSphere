@@ -1,16 +1,14 @@
 const nodemailer = require("nodemailer");
 
 const sendEmail = async (options) => {
-  // Use ethereal to generate a test account
-  let testAccount = await nodemailer.createTestAccount();
-
+  // Use hardcoded ethereal account
   const transporter = nodemailer.createTransport({
     host: "smtp.ethereal.email",
     port: 587,
     secure: false,
     auth: {
-      user: testAccount.user,
-      pass: testAccount.pass,
+      user: 'zt2fzdompdp7bajx@ethereal.email',
+      pass: 'AFFt6hdYVzSs2WPnum'
     },
   });
 

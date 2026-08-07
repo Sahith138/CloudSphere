@@ -197,15 +197,13 @@ const forgotPassword = async (req, res) => {
 
       res.status(200).json({ success: true, message: "Email sent" });
     } catch (error) {
-      // Revert if email fails
-      await prisma.user.update({
-        where: { email },
-        data: {
-          resetPasswordToken: null,
-          resetPasswordExpires: null,
-        },
+      console.error("Email error:", error);
+      // If email fails (like Ethereal expiring), don't revert the token.
+      // Just return the link directly so the user can test the app without an email server!
+      return res.status(200).json({ 
+        success: true, 
+        message: `Testing Fallback: Email failed to send, but here is your link: ${resetUrl}` 
       });
-      return res.status(500).json({ success: false, message: "Email could not be sent" });
     }
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
