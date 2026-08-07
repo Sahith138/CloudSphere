@@ -30,8 +30,14 @@ function Register() {
     setErrorMsg("");
 
     try {
-      await API.post("/auth/register", { name, email, password });
-      navigate("/");
+      const res = await API.post("/auth/register", { name, email, password });
+      if (res.data.token) {
+        sessionStorage.setItem("token", res.data.token);
+        sessionStorage.setItem("user", JSON.stringify(res.data.user));
+        navigate("/dashboard");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       setErrorMsg(error.response?.data?.message || "Registration Failed");
     } finally {

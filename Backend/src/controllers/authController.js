@@ -65,9 +65,21 @@ const register = async (req, res) => {
       }
     }
 
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+
     res.status(201).json({
       success: true,
       message: pendingInvites.length > 0 ? `User Registered and joined ${pendingInvites.length} group(s)!` : "User Registered",
+      token,
       user: {
         id: user.id,
         name: user.name,
