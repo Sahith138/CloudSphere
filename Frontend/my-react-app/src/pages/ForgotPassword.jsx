@@ -50,7 +50,7 @@ function ForgotPassword() {
 
         {message && (
           <div className="mb-6 p-4 bg-green-500/10 border border-green-500/50 rounded-xl flex items-center gap-3 text-green-400 text-sm">
-            <span>{message}</span>
+            <span className="break-all">{message}</span>
           </div>
         )}
 

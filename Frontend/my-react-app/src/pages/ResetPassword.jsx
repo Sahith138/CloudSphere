@@ -60,7 +60,7 @@ function ResetPassword() {
 
         {errorMsg && (
           <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl flex items-center gap-3 text-red-200 text-sm">
-            <span>{errorMsg}</span>
+            <span className="break-all">{errorMsg}</span>
           </div>
         )}
 
