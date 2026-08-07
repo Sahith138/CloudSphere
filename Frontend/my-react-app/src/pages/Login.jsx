@@ -86,12 +86,18 @@ function Login() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-slate-900/50 border border-slate-700/50 text-white placeholder-slate-400 rounded-xl py-3 pl-11 pr-4 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />
+            
+            <div className="flex justify-end mt-2">
+              <Link to="/forgot-password" className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
+                Forgot Password?
+              </Link>
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 rounded-xl shadow-lg hover:shadow-blue-500/30 transition-all flex justify-center items-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 rounded-xl shadow-lg hover:shadow-blue-500/30 transition-all flex justify-center items-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed mt-2"
           >
             {loading ? "Signing In..." : "Sign In"}
             {!loading && <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />}

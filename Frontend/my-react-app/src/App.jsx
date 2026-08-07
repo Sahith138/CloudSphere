@@ -21,6 +21,8 @@ import AdminRoute from "./components/AdminRoute";
 import Layout from "./components/Layout";
 import SharedFile from "./pages/SharedFile";
 import Search from "./pages/Search";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -31,6 +33,8 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/shared/:token" element={<SharedFile />} />
 
         {/* Protected Routes Wrapped in Layout */}
